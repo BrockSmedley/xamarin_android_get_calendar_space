@@ -86,10 +86,9 @@ namespace GetFreeCalendarSpace {
 						start = eDate;
 					}	
 				}
-
 				// after last event, add free time from end of event until midnight, as long as event ends before midnight
-				if (cursor.IsLast && eDate < DateTime.Today.AddDays(1)) {
-					freetime.Add(new FreeTime() { Start = start, End = DateTime.Today.AddDays(1) });
+				else if (eDate >= now && sDate < tomorrow && eDate < tomorrow) {
+					freetime.Add(new FreeTime() { Start = eDate, End = DateTime.Today.AddDays(1) });
 				}
 			}
 
