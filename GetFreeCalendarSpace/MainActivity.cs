@@ -62,14 +62,15 @@ namespace GetFreeCalendarSpace {
 			JavaList<FreeTime> freetime = new JavaList<FreeTime>();
 			//start looking for free time at 12AM today; the earliest anything can start today
 			DateTime start = DateTime.Now.ToLocalTime();
+			DateTime tomorrow = DateTime.Today.ToLocalTime().AddDays(1);
+			DateTime now = DateTime.Now.ToLocalTime(); //12AM today
 
 			//iterate through items to find selected events
 			while (cursor.MoveToNext()) {
 				//get date for this event (start & end Date/Time in tick format)
 				DateTime sDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(cursor.GetLong(2)).ToLocalTime();//index 2 is start date; 3 is end date
 				DateTime eDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(cursor.GetLong(3)).ToLocalTime();
-				DateTime tomorrow = DateTime.Today.ToLocalTime().AddDays(1);
-				DateTime now = DateTime.Now.ToLocalTime(); //12AM today
+				
 
 
 				if (sDate >= now && sDate < tomorrow) {
@@ -90,6 +91,10 @@ namespace GetFreeCalendarSpace {
 				else if (eDate >= now && sDate < tomorrow && eDate < tomorrow) {
 					freetime.Add(new FreeTime() { Start = eDate, End = DateTime.Today.AddDays(1) });
 				}
+			}
+			// if there are no events to list, add freetime from now to midnight
+			if (selectedEventsCursor.Count == 0) {
+				freetime.Add(new FreeTime() { Start=start, End = tomorrow });
 			}
 
 
