@@ -64,12 +64,13 @@ namespace GetFreeCalendarSpace {
 			DateTime start = DateTime.Now.ToLocalTime();
 			DateTime tomorrow = DateTime.Today.ToLocalTime().AddDays(1);
 			DateTime now = DateTime.Now.ToLocalTime(); //12AM today
+			DateTime sDate, eDate;
 
 			//iterate through items to find selected events
 			while (cursor.MoveToNext()) {
 				//get date for this event (start & end Date/Time in tick format)
-				DateTime sDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(cursor.GetLong(2)).ToLocalTime();//index 2 is start date; 3 is end date
-				DateTime eDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(cursor.GetLong(3)).ToLocalTime();
+				sDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(cursor.GetLong(2)).ToLocalTime();//index 2 is start date; 3 is end date
+				eDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(cursor.GetLong(3)).ToLocalTime();
 				
 
 
@@ -96,7 +97,9 @@ namespace GetFreeCalendarSpace {
 			if (selectedEventsCursor.Count == 0) {
 				freetime.Add(new FreeTime() { Start=start, End = tomorrow });
 			}
-
+			//on last item, add freetime from end of last event to midnight
+			else if (start.Ticks < tomorrow.Ticks)
+				freetime.Add(new FreeTime() { Start = start, End = tomorrow });
 
 			SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, Resource.Layout.CalListItem, selectedEventsCursor, sourceColumns, targetResources);
 
@@ -133,6 +136,6 @@ namespace GetFreeCalendarSpace {
 				end = value;
 			}
 		}
-	};
+	}
 }
 
